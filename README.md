@@ -1,12 +1,15 @@
+# test sip.js webrtc with getstats and puppeteer
 
 
+This repository contains an integration example of SIP.JS.
 
-# commands
-npm init -y
-npm install webpack webpack-cli --save-dev
-npx webpack
+It does get the WebRTC stats, compute MOS score and send it as an header in the BYE message of every call.
 
-# webpack tutorial
-https://webpack.js.org/guides/getting-started/
 
-# puppet-getstats-sip.js
+### build docker image
+from the test directory
+`./build.sh`
+
+### run the test
+from the test directory
+`./run.sh`
