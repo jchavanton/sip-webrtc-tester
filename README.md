@@ -7,10 +7,8 @@ It does get the WebRTC stats, compute MOS score and send it as an header in the 
 
 Puppetter integration to test the code with an headless chrome is provided as well.
 
-### build docker image
-from the test directory
+### build docker image with the headless chrome, puppetter and the integration using webpack 
 `./build.sh`
 
-### run the test
-from the test directory
+### run the puppetter test from a docker container
 `./run.sh`
