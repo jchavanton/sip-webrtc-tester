@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Getting Started</title>
+  </head>
+  <style>
+audio { margin: 8px; }
+body { display: flex; flex-direction: column; justify-content: center; }
+button { width: 100px; margin: 8px; }
+input { margin: 8px;}
+.dtmf { margin: 8px;}
+  </style>
+  <body>
+      <audio id="mediaElement" controls>
+        <p>Your browser doesn't support HTML5 audio.</p>
+      </audio>
+      <ol>
+      <li><button id="connect">Connect</button> to <code>
+        <select name="server" id="server">
+        <option value="wss://webrtc.castmm.com:443">wss://webrtc-alpha.castmm.com:443</option>
+        </select></code>
+      </li>
+      <li><button id="call" >Place Call</button> to <code>
+        <select name="target" id="target">
+          <option value="sip:extension@webrtc.castmm.com">sip:extension@webrtc.castmm.com</option>
+        </select></code></li>
+      <li><button id="hangup" >Hangup Call</button></li>
+      <li><button id="disconnect" >Disconnect</button></li>
+      </ol>
+    <script src="main.js"></script>
+<script>
+        function sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        window.onload = function(){
+                async function test() {
+                        document.getElementById('connect').click();
+                        var scriptTag = document.createElement("script");
+                        scriptTag.src = "https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js";
+                        document.getElementsByTagName("head")[0].appendChild(scriptTag);
+                        document.getElementById('connect').click();
+                        await sleep(2000);
+                        document.getElementById('call').click();
+                }
+                test();
+        }
+     </script>
+    <div id="stats-box" class="stats-box"></div>
+  </body>
+</html>
