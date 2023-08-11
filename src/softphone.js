@@ -1,21 +1,3 @@
-/*
- * Copyright (C) 2022 Julien Chavanton <jchavanton@gmail.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- */
-
 import {
     Invitation,
     Inviter,
@@ -154,8 +136,8 @@ function getQosHearders() {
    'X-audioLevel: ' + getAudioLevel(), // https://docs.w3cub.com/dom/rtcrtpcontributingsource/audiolevel
    'X-totalAudioEnergy: ' + getTotalAudioEnergy(),
    'X-removedSamplesForAcceleration: ' + getRemovedSamplesForAcceleration(),
-   'X-jitterBufferDelay ' +  getJitterBufferDelay(),
-   'X-jitterBufferEmittedCount ' +  getJitterBufferEmittedCount(),
+   'X-jitterBufferDelay: ' +  getJitterBufferDelay(),
+   'X-jitterBufferEmittedCount: ' +  getJitterBufferEmittedCount(),
    'X-concealedSamples: ' + getConcealedSamples(),
    'X-silentConcealedSamples: ' + getSilentConcealedSamples(),
    'X-packetsDiscarded: ' + getPacketsDiscarded(),
@@ -191,7 +173,7 @@ export function userAgentCall(xpin, destination, mediaElementName, connected, di
       }
     }
     var inviterOptions = InviterOptions = {};
-    var extraHeaders = [ 'X-pin: ' + xpin];
+    var extraHeaders = [ 'X-pin: ' + xpin ,'X-PBX-IP: 172.31.50.188' ]; //,  'X-DISABLE-FS: true' ]; // , 'X-PBX-IP: 172.31.51.246' ];
     inviterOptions['extraHeaders'] = extraHeaders
     inviterOptions.delegate = delegate;
     const inviter = new Inviter(userAgent, target, inviterOptions);

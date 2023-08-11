@@ -18,16 +18,54 @@ input { margin: 8px;}
       <ol>
       <li><button id="connect">Connect</button> to <code>
         <select name="server" id="server">
-        <option value="wss://webrtc.castmm.com:443">wss://webrtc-alpha.castmm.com:443</option>
-        </select></code>
+        <option value="wss://pbx.dead-orbit.com:443">wss://pbx.dead-orbit.com [dead-orbit]</option>
+      </select></code>
       </li>
+      <li>&nbsp;&nbsp;X-pin:<input type="text" id="xpin" name="xpin" required minlength="5" maxlength="10"></li>
       <li><button id="call" >Place Call</button> to <code>
         <select name="target" id="target">
-          <option value="sip:extension@webrtc.castmm.com">sip:extension@webrtc.castmm.com</option>
+          <option value="sip:echo@webrtcgw.com">sip:echo@webrtcgw.com</option>
         </select></code></li>
       <li><button id="hangup" >Hangup Call</button></li>
       <li><button id="disconnect" >Disconnect</button></li>
       </ol>
+       <p>
+    While the call is established, DTMF may be sent using the following "keypad"...
+  </p>
+  <div class="dtmf">DTMF sent: <span id="dtmf"></span></div>
+  <div>
+    <div>
+      <button class="keypad" >1</button>
+      <button class="keypad" >2</button>
+      <button class="keypad" >3</button>
+    </div>
+    <div>
+      <button class="keypad" >4</button>
+      <button class="keypad" >5</button>
+      <button class="keypad" >6</button>
+    </div>
+    <div>
+      <button class="keypad" >7</button>
+      <button class="keypad" >8</button>
+      <button class="keypad" >9</button>
+    </div>
+    <div>
+      <button class="keypad" >*</button>
+      <button class="keypad" >0</button>
+      <button class="keypad" >#</button>
+    </div>
+  </div>
+   <p>
+    While the call is established, the session may placed on hold or muted...
+  </p>
+  <div>
+    <input type="checkbox" id="hold" name="hold" disabled>
+    <label for="hold">Hold</label>
+  </div>
+  <div>
+    <input type="checkbox" id="mute" name="mute" disabled>
+    <label for="mute">Mute</label>
+  </div>
     <script src="main.js"></script>
     <div id="stats-box" class="stats-box"></div>
   </body>
