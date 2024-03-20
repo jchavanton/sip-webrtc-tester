@@ -2,38 +2,38 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Getting Started</title>
+    <title>webrtc test softphone</title>
   </head>
   <style>
 audio { margin: 8px; }
 body { display: flex; flex-direction: column; justify-content: center; }
 button { width: 100px; margin: 8px; }
+.bset { width: 50px; margin: 8px; }
+.main { margin: 22px;}
 input { margin: 8px;}
 .dtmf { margin: 8px;}
   </style>
   <body>
-      <audio id="mediaElement" controls>
-        <p>Your browser doesn't support HTML5 audio.</p>
-      </audio>
-      <ol>
-      <li><button id="connect">Connect</button> to <code>
-        <select name="server" id="server">
-        <option value="wss://pbx.dead-orbit.com:443">wss://pbx.dead-orbit.com [dead-orbit]</option>
-      </select></code>
-      </li>
-      <li>&nbsp;&nbsp;X-pin:<input type="text" id="xpin" name="xpin" required minlength="5" maxlength="10"></li>
-      <li><button id="call" >Place Call</button> to <code>
-        <select name="target" id="target">
-          <option value="sip:echo@webrtcgw.com">sip:echo@webrtcgw.com</option>
-        </select></code></li>
-      <li><button id="hangup" >Hangup Call</button></li>
-      <li><button id="disconnect" >Disconnect</button></li>
-      </ol>
+
+<div class="main">
+  <audio id="mediaElement" controls>
+    <p>Your browser doesn't support HTML5 audio.</p>
+  </audio>
+<code>
+	<div>Server: `wss://`<input type="text" id="server" name="server" required minlength="1" maxlength="100"><button class="bset" id="set_server">set</button></div>
+	<div>Username:       <input type="text" id="username" name="username" required minlength="1" maxlength="100"><button class="bset" id="set_username" >set</button></div>
+	<div>Password:       <input type="password" id="password" name="password" required minlength="1" maxlength="100"><button class="bset" id="set_password" >set</button></div>
+	<div>X-pin:          <input type="text" id="xpin" name="xpin" required minlength="5" maxlength="10"><button class="bset" id="set_xpin">set</button></div>
+	<div>callee:   `sip:`<input type="text" id="callee" name="callee" required minlength="1" maxlength="100"><button class="bset" id="set_callee">set</button></div>
+
+	<div><button id="connect">Connect</button>	<button id="call" >Place Call</button></div>
+	<div><button id="hangup" >Hangup Call</button> <button id="disconnect" >Disconnect</button>
        <p>
     While the call is established, DTMF may be sent using the following "keypad"...
   </p>
+
   <div class="dtmf">DTMF sent: <span id="dtmf"></span></div>
-  <div>
+
     <div>
       <button class="keypad" >1</button>
       <button class="keypad" >2</button>
@@ -68,5 +68,7 @@ input { margin: 8px;}
   </div>
     <script src="main.js"></script>
     <div id="stats-box" class="stats-box"></div>
+  </code>
+</div>
   </body>
 </html>

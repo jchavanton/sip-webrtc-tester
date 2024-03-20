@@ -2,9 +2,9 @@ import {
     Invitation,
     Inviter,
     InviterOptions,
-    Referral,
     Registerer,
     RegistererOptions,
+    Referral,
     Session,
     SessionState,
     UserAgent,
@@ -114,17 +114,41 @@ async function startMedia(Session, mediaElementName) {
     getStats(pc);
 }
 
-export function userAgentConnect(server) {
+export function UserAgentRegisteredOptionTags(userAgent) {
+  var registererOptions = RegistererOptions = {};
+  var extraHeaders = [ 'X-CLIENT: Web' ];
+  registererOptions['extraHeaders'] = extraHeaders
+  const registerer = new Registerer(userAgent, registererOptions);
+  registerer.register();
+}
+
+export function userAgentConnect(params) {
   const transportOptions = {
-    server: server,
+    server: 'wss://'+params.server,
     keepAliveInterval: 60,
   };
+
+  var delegate = {
+    onInvite: (invitation) => {
+      invitation.accept();
+    }
+  }
+  var uri = 'sip:'+params.username+'@'+params.server
+  console.log("URI >>>> "+uri)
+
   const userAgentOptions = {
     transportOptions : transportOptions,
     reconnectionAttempts: 4,
-    reconnectionDelay: 4
+    reconnectionDelay: 4,
+    authorizationUsername: params.username,
+    authorizationPassword: params.password,
+    uri: UserAgent.makeURI(uri),
+    delegate,
   };
   userAgent = new UserAgent(userAgentOptions);
+  userAgent.start().then(() => {
+   UserAgentRegisteredOptionTags(userAgent, server)
+  });
 }
 
 function getQosHearders() {
@@ -155,14 +179,14 @@ function getQosHearders() {
 
 var startTime = null;
 
+
+
 export function userAgentCall(xpin, destination, mediaElementName, connected, disconnected) {
     if (!userAgent) {
         console.log("useragent not connected !");
         return;
     }
-
-    userAgent.start(outgoingSession).then(() => {
-    // const target = UserAgent.makeURI("sip:echo@webrtc-gw.connectingpointpro.com");
+  
     const target = UserAgent.makeURI(destination);
   
     var delegate = {
@@ -173,7 +197,7 @@ export function userAgentCall(xpin, destination, mediaElementName, connected, di
       }
     }
     var inviterOptions = InviterOptions = {};
-    var extraHeaders = [ 'X-pin: ' + xpin ,'X-PBX-IP: 172.31.50.188' ]; //,  'X-DISABLE-FS: true' ]; // , 'X-PBX-IP: 172.31.51.246' ];
+    var extraHeaders = [ 'X-pin: ' + xpin ];
     inviterOptions['extraHeaders'] = extraHeaders
     inviterOptions.delegate = delegate;
     const inviter = new Inviter(userAgent, target, inviterOptions);
@@ -207,7 +231,7 @@ export function userAgentCall(xpin, destination, mediaElementName, connected, di
            break;
        }
      });
-    });
+    // });
 
 }
 

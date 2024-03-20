@@ -21,22 +21,68 @@ import {userAgentConnect, userAgentCall,userAgentDisconnectCall} from "./softpho
 var buttonConnect = document.querySelector('#connect');
 var buttonCall = document.querySelector('#call');
 var buttonDisconnect = document.querySelector('#disconnect');
+var buttonSetserver = document.querySelector('#set_server');
+var buttonSetusername = document.querySelector('#set_username');
+var buttonSetpassword = document.querySelector('#set_password');
+var buttonSetxpin = document.querySelector('#set_xpin');
+var buttonSetcallee = document.querySelector('#set_callee');
+
+document.getElementById("server").value = localStorage.getItem('server');
+document.getElementById("username").value = localStorage.getItem('username');
+document.getElementById("password").value = localStorage.getItem('password');
+document.getElementById("xpin").value = localStorage.getItem('xpin');
+document.getElementById("callee").value = localStorage.getItem('callee');
+
+buttonSetserver.addEventListener('click', ()=>{
+  var v = document.getElementById("server").value
+  console.log(v)
+  localStorage.setItem("server",v)
+})
+buttonSetusername.addEventListener('click', ()=>{
+  var v = document.getElementById("username").value
+  console.log(v)
+  localStorage.setItem("username",v)
+})
+buttonSetpassword.addEventListener('click', ()=>{
+  var v = document.getElementById("password").value
+  console.log(v)
+  localStorage.setItem("password",v)
+})
+buttonSetxpin.addEventListener('click', ()=>{
+  var v = document.getElementById("xpin").value
+  console.log(v)
+  localStorage.setItem("xpin",v)
+})
+buttonSetcallee.addEventListener('click', ()=>{
+  var v = document.getElementById("callee").value
+  console.log(v)
+  localStorage.setItem("callee",v)
+})
 
 function connected () {
   console.log("connected ...");
 }
+
 function disconnected () {
   console.log("disconnected ...");
 }
 
 buttonConnect.addEventListener('click', ()=>{ 
-  console.log( document.getElementById("server").value)
-  userAgentConnect(document.getElementById("server").value);
+  console.log('wss://'+localStorage.getItem('server'))
+  const params = {
+    server: localStorage.getItem('server'),
+    username: localStorage.getItem('username'),
+    password: localStorage.getItem('password'),
+    xpin: localStorage.getItem('xpin'),
+    callee: 'sip:'+localStorage.getItem('callee'),
+  }
+  userAgentConnect(params);
 })
 
 buttonCall.addEventListener('click', ()=>{ 
-  var target = document.getElementById("target").value;
-  userAgentCall(target, "mediaElement", connected, disconnected);
+  var target = 'sip:'+localStorage.getItem('callee');
+  console.log("calling:"+target)
+  userAgentCall("", target, "mediaElement", connected, disconnected);
 })
 
 buttonDisconnect.addEventListener('click', ()=>{ 
