@@ -1,3 +1,4 @@
+import { isNil } from "lodash";
 import {
     Invitation,
     Inviter,
@@ -179,8 +180,6 @@ function getQosHearders() {
 
 var startTime = null;
 
-
-
 export function userAgentCall(xpin, destination, mediaElementName, connected, disconnected) {
     if (!userAgent) {
         console.log("useragent not connected !");
@@ -231,12 +230,17 @@ export function userAgentCall(xpin, destination, mediaElementName, connected, di
            break;
        }
      });
-    // });
-
 }
 
 export function userAgentDisconnectCall(disconnected) {
+
+    if (outgoingSession == null) {
+      return;
+    }
+    console.log("hangup ...")
+
     var session = outgoingSession;
+
     console.log("userAgentDisconnectCall:"+session.state);
     switch(session.state) {
         case SessionState.Initial:
@@ -278,4 +282,10 @@ export function userAgentDisconnectCall(disconnected) {
             // Cannot terminate a session that is already terminated
           break;
       }
+}
+
+export function userAgentDisconnect(disconnected) {
+  console.log("disconnecting ...")
+  userAgentDisconnectCall(disconnected)
+  userAgent.stop();
 }

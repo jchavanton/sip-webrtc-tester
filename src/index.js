@@ -16,10 +16,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA~
  */
 
-import {userAgentConnect, userAgentCall,userAgentDisconnectCall} from "./softphone";
+import {userAgentConnect, userAgentCall,userAgentDisconnectCall,userAgentDisconnect} from "./softphone";
 
 var buttonConnect = document.querySelector('#connect');
 var buttonCall = document.querySelector('#call');
+var buttonHangup = document.querySelector('#hangup');
 var buttonDisconnect = document.querySelector('#disconnect');
 var buttonSetserver = document.querySelector('#set_server');
 var buttonSetusername = document.querySelector('#set_username');
@@ -85,6 +86,10 @@ buttonCall.addEventListener('click', ()=>{
   userAgentCall("", target, "mediaElement", connected, disconnected);
 })
 
-buttonDisconnect.addEventListener('click', ()=>{ 
+buttonDisconnect.addEventListener('click', ()=>{
+  userAgentDisconnect(disconnected);
+})
+
+buttonHangup.addEventListener('click', ()=>{
   userAgentDisconnectCall(disconnected);
 })
