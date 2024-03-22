@@ -4,7 +4,7 @@ This SIP.js client will also get the [WebRTC stats](https://www.w3.org/TR/webrtc
 
 A Puppetter integration to test the code with an headless chrome is provided as well.
 
-![image](https://github.com/jchavanton/sip-webrtc-tester/assets/3736014/b2ed9a72-b4a7-4d70-b242-1aaeb92bd26d)
+![image](https://github.com/jchavanton/sip-webrtc-tester/assets/3736014/1cb3dee5-6574-439f-9651-c329e9da292d)
 
 
 ## how-to build locally
