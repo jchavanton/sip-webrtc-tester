@@ -26,7 +26,7 @@ import {
 // TODO https://stackoverflow.com/questions/70787567/ice-restart-with-sip-js
 
 var userAgent = null;
-var outgoingSession = null;
+var activeSession = null;
 var iceRestart = 0;
 
 async function setIceRestartHandler(session) {
@@ -67,7 +67,7 @@ async function setIceRestartHandler(session) {
      */
  export function sendDtmf(tones, options) {
     console.log("SessionDescriptionHandler.sendDtmf");
-    var sdh = outgoingSession.sessionDescriptionHandler;
+    var sdh = activeSession.sessionDescriptionHandler;
     var pc = sdh.peerConnection;
     if (pc === undefined) {
       console.log("SessionDescriptionHandler.sendDtmf failed - peer connection closed");
@@ -123,15 +123,37 @@ export function UserAgentRegisteredOptionTags(userAgent) {
   registerer.register();
 }
 
-export function userAgentConnect(params) {
+export function userAgentConnect(params, connected, disconnected) {
   const transportOptions = {
     server: 'wss://'+params.server,
     keepAliveInterval: 60,
   };
 
   var delegate = {
-    onInvite: (invitation) => {
+    onInvite: (invitation, connected, disconnected) => {
       invitation.accept();
+      activeSession = invitation
+      activeSession.stateChange.addListener((SessionState) => {
+        console.log(`#### Session state changed >> to ${SessionState}`);
+ 
+        switch (SessionState) {
+          case SessionState.Establishing:
+            break;
+          case "Established":
+            startTime = Date.now();
+            startMedia(invitation, "mediaElement");
+            // connected();
+            console.log(`#### Session state changed >> to ${SessionState} connected !`);
+
+            break;
+          case SessionState.Terminated:
+            disconnected();
+            break;
+          default:
+            console.log(`#### unknown`);
+            break;
+        }
+      });
     }
   }
   var uri = 'sip:'+params.username+'@'+params.server
@@ -185,7 +207,6 @@ export function userAgentCall(xpin, destination, mediaElementName, connected, di
         console.log("useragent not connected !");
         return;
     }
-  
     const target = UserAgent.makeURI(destination);
   
     var delegate = {
@@ -202,10 +223,10 @@ export function userAgentCall(xpin, destination, mediaElementName, connected, di
     const inviter = new Inviter(userAgent, target, inviterOptions);
     inviter.invite();
 
-    outgoingSession = inviter;
+    activeSession = inviter;
 
     // Handle outgoing session state changes.
-    outgoingSession.stateChange.addListener((SessionState) => {
+    activeSession.stateChange.addListener((SessionState) => {
        console.log(`#### Session state changed >> to ${SessionState}`);
 
        switch (SessionState) {
@@ -234,12 +255,13 @@ export function userAgentCall(xpin, destination, mediaElementName, connected, di
 
 export function userAgentDisconnectCall(disconnected) {
 
-    if (outgoingSession == null) {
+    if (activeSession == null) {
+      console.log("hangup, no session ...")
       return;
     }
     console.log("hangup ...")
 
-    var session = outgoingSession;
+    var session = activeSession;
 
     console.log("userAgentDisconnectCall:"+session.state);
     switch(session.state) {

@@ -77,7 +77,7 @@ buttonConnect.addEventListener('click', ()=>{
     xpin: localStorage.getItem('xpin'),
     callee: 'sip:'+localStorage.getItem('callee'),
   }
-  userAgentConnect(params);
+  userAgentConnect(params, connected, disconnected);
 })
 
 buttonCall.addEventListener('click', ()=>{ 

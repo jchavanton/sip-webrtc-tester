@@ -92,8 +92,19 @@ export function getTotalAudioEnergy(){
 
 async function stats(stats) {
     var statsOutput = "";
-
+    var statsJson = "[";
+    var i = 0;
+   // console.log("JSON STATS:" + JSON.stringify(stats))
     stats.forEach((report) => {
+        //console.log("JSON STATS REPORT:" + JSON.stringify(report))
+        if (report.type != "certificate") {
+            if (i != 0) {
+                statsJson += ",";
+            }
+            i += 1;
+            statsJson += JSON.stringify(report);
+        }
+
         Object.keys(report).forEach((statName) => {
             if (report.type == "outbound-rtp") {
                 if (statName === "ssrc") {
@@ -241,6 +252,8 @@ async function stats(stats) {
         }
        });
      });
+     statsJson += "]";;
+     console.log("JSON:"+statsJson)
      document.querySelector(".stats-box").innerHTML = statsOutput;
      if (remoteInboundRtp.roundTripTime > 0) {
         // global Mos Tx/Rx
