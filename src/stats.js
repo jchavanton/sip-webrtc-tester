@@ -29,6 +29,7 @@ var packetsDiscarded=-1;
 var packetsReceived=-1;
 var silentConcealedSamples=-1;
 var ssrcCount=0;
+var statsJson="";
 
 function updateEstimate(estimate, value) {
     // Exponentially Weighted Moving Average (EWMA)
@@ -56,8 +57,9 @@ export function geTotalSamplesReceived(){
 export function getSilentConcealedSamples(){
     return silentConcealedSamples;
 }
-
-
+export function getStatsJson(){
+    return statsJson;
+}
 export function getAudioLevel(){
     return audioLevel.toFixed(4);
 }
@@ -92,17 +94,29 @@ export function getTotalAudioEnergy(){
 
 async function stats(stats) {
     var statsOutput = "";
-    var statsJson = "[";
+    statsJson = "[";
     var i = 0;
-   // console.log("JSON STATS:" + JSON.stringify(stats))
+    var localCandidateId = ""
+    var remoteCandidateId = ""
     stats.forEach((report) => {
-        //console.log("JSON STATS REPORT:" + JSON.stringify(report))
         if (report.type != "certificate") {
-            if (i != 0) {
-                statsJson += ",";
+            var include = true;
+            if (report.type == "candidate-pair") {
+                localCandidateId = report.localCandidateId;
+                remoteCandidateId = report.remoteCandidateId;
+                console.log(localCandidateId +"<>"+ remoteCandidateId);
+            } else if ((report.type == "local-candidate" && report.id != localCandidateId) 
+                    || (report.type == "remote-candidate" && report.id != remoteCandidateId)) {
+                include = false;
             }
-            i += 1;
-            statsJson += JSON.stringify(report);
+
+            if (include) {
+                if (i != 0) {
+                    statsJson += ",";
+                }
+                i += 1;
+                statsJson += JSON.stringify(report);
+            }
         }
 
         Object.keys(report).forEach((statName) => {
@@ -128,7 +142,7 @@ async function stats(stats) {
 
         if (report.type == "inbound-rtp") {
             Object.keys(report).forEach((statName) => {
-                console.log(`${statName} : ${report[statName]}`);
+                //console.log(`${statName} : ${report[statName]}`);
                 if (statName === "ssrc") {
                     if (inboundSsrcLast == -1) {
                         inboundSsrcLast = report[statName];
@@ -136,74 +150,74 @@ async function stats(stats) {
                     } else {
                         inboundSsrcNew = report[statName];
                     }
-                    console.log("inbound-rtp ssrc: "+ inboundSsrcNew);
+                    //console.log("inbound-rtp ssrc: "+ inboundSsrcNew);
                 } else if (statName === "jitter") {
                     localInboundRtp.jitter = report[statName];
-                    console.log("inbound-rtp jitter: "+ report[statName]);
+                    //console.log("inbound-rtp jitter: "+ report[statName]);
                 } else if (statName === "packetsLost") {
                     if (inboundSsrcLast != inboundSsrcNew) {
                         localInboundRtp.packetsLost += report[statName];
                     } else {
                         localInboundRtp.packetsLost = report[statName];
                     }
-                    console.log("inbound-rtp packetsLost: "+ report[statName]);
+                    //console.log("inbound-rtp packetsLost: "+ report[statName]);
                 } else if (statName === "packetsReceived") {
                     if (inboundSsrcLast != inboundSsrcNew) {
                         localInboundRtp.packetsReceived += report[statName];
                     } else {
                         localInboundRtp.packetsReceived = report[statName];
                     }
-                    console.log("inbound-rtp packetsReceived: "+ report[statName]);
-                    console.log("inbound-rtp packetsReceivedDuration: "+ getPacketsReceivedDuration());
+                    //console.log("inbound-rtp packetsReceived: "+ report[statName]);
+                    //console.log("inbound-rtp packetsReceivedDuration: "+ getPacketsReceivedDuration());
                 } else if (statName === "silentConcealedSamples") {
                     if (inboundSsrcLast != inboundSsrcNew) {
                         silentConcealedSamples += report[statName];
                     } else {
                         silentConcealedSamples = report[statName];
                     }
-                    console.log("inbound-rtp silentConcealedSamples: "+ report[statName]);
+                    //console.log("inbound-rtp silentConcealedSamples: "+ report[statName]);
                 } else if (statName === "totalSamplesDuration") {
                     if (inboundSsrcLast != inboundSsrcNew) {
                         totalSamplesDuration += report[statName];
                     } else {
                         totalSamplesDuration = report[statName];
                     }
-                    console.log("inbound-rtp totalSamplesDuration: "+ report[statName]);
+                    //console.log("inbound-rtp totalSamplesDuration: "+ report[statName]);
                 } else if (statName === "totalSamplesReceived") {
                     if (inboundSsrcLast != inboundSsrcNew) {
                         totalSamplesReceived += report[statName];
                     } else {
                         totalSamplesReceived = report[statName];
                     }
-                    console.log("inbound-rtp totalSamplesReceived: "+ report[statName]);
+                    //console.log("inbound-rtp totalSamplesReceived: "+ report[statName]);
                 } else if (statName === "audioLevel") {
                     if (audioLevel == -1) {
                         audioLevel = report[statName];
                     } else {
                         audioLevel = updateEstimate(audioLevel ,report[statName]);
                     }
-                    console.log("inbound-rtp getAudioLevel: "+ report[statName]);
+                    //console.log("inbound-rtp getAudioLevel: "+ report[statName]);
                 } else if (statName === "removedSamplesForAcceleration") {
                     removedSamplesForAcceleration = report[statName];
-                    console.log("inbound-rtp removedSamplesForAcceleration: "+ report[statName]);
+                    //console.log("inbound-rtp removedSamplesForAcceleration: "+ report[statName]);
                 } else if (statName === "totalSamplesReceived") {
                     totalSamplesReceived = report[statName];
-                    console.log("inbound-rtp totalSamplesReceived: "+ report[statName]);
+                    //console.log("inbound-rtp totalSamplesReceived: "+ report[statName]);
                 } else if (statName === "concealedSamples") {
                     concealedSamples = report[statName];
-                    console.log("inbound-rtp concealedSamples: "+ report[statName]);
+                    //console.log("inbound-rtp concealedSamples: "+ report[statName]);
                 } else if (statName === "jitterBufferDelay") {
                     jitterBufferDelay = report[statName];
-                    console.log("inbound-rtp jitterBufferDelay: "+ report[statName]);
+                    //console.log("inbound-rtp jitterBufferDelay: "+ report[statName]);
                 } else if (statName === "jitterBufferEmittedCount") {
                     jitterBufferEmittedCount = report[statName];
-                    console.log("inbound-rtp jitterBufferEmittedCount: "+ report[statName]);
+                    //console.log("inbound-rtp jitterBufferEmittedCount: "+ report[statName]);
                 } else if (statName === "packetsDiscarded") {
                     packetsDiscarded = report[statName];
-                    console.log("inbound-rtp packetsDiscarded: "+ report[statName]);
+                    //console.log("inbound-rtp packetsDiscarded: "+ report[statName]);
                 } else if (statName === "totalAudioEnergy") {
                     totalAudioEnergy = report[statName];
-                    console.log("inbound-rtp totalAudioEnergy: "+ report[statName]);
+                    //console.log("inbound-rtp totalAudioEnergy: "+ report[statName]);
                 }
             });
             localInboundRtp.fractionLost = localInboundRtp.packetsLost/(localInboundRtp.packetsReceived+localInboundRtp.packetsLost);
@@ -253,7 +267,7 @@ async function stats(stats) {
        });
      });
      statsJson += "]";;
-     console.log("JSON:"+statsJson)
+     console.log(statsJson)
      document.querySelector(".stats-box").innerHTML = statsOutput;
      if (remoteInboundRtp.roundTripTime > 0) {
         // global Mos Tx/Rx

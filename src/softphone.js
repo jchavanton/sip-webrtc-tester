@@ -17,7 +17,7 @@ import {
 } from "./sip-0.21.2.js";
 
 import {
-  getMos, getStats, startStats, stopStats, getPacketsReceived, getPacketsReceivedDuration,
+  getMos, getStats, getStatsJson, startStats, stopStats, getPacketsReceived, getPacketsReceivedDuration,
   getAudioLevel, getTotalAudioEnergy, getRemovedSamplesForAcceleration, getSsrcCount,
   getConcealedSamples, getJitterBufferDelay, getPacketsDiscarded,getSilentConcealedSamples,
   geTotalSamplesReceived, getTotalSamplesDuration, getJitterBufferEmittedCount
@@ -27,6 +27,7 @@ import {
 
 var userAgent = null;
 var activeSession = null;
+var activeServer = null;
 var iceRestart = 0;
 
 async function setIceRestartHandler(session) {
@@ -133,6 +134,7 @@ export function userAgentConnect(params, connected, disconnected) {
     onInvite: (invitation, connected, disconnected) => {
       invitation.accept();
       activeSession = invitation
+      activeServer = params.server
       activeSession.stateChange.addListener((SessionState) => {
         console.log(`#### Session state changed >> to ${SessionState}`);
  
@@ -202,7 +204,13 @@ function getQosHearders() {
 
 var startTime = null;
 
-export function userAgentCall(xpin, destination, mediaElementName, connected, disconnected) {
+export function sendMessage(server, content) {
+  const target = UserAgent.makeURI("sip:stats@"+server);
+  const messager = new Messager(userAgent, target, content);
+  messager.message()
+}
+
+export function userAgentCall(xpin, server, destination, mediaElementName, connected, disconnected) {
     if (!userAgent) {
         console.log("useragent not connected !");
         return;
@@ -214,6 +222,7 @@ export function userAgentCall(xpin, destination, mediaElementName, connected, di
         console.log(`>>>> on bye <<<<<`);
 	      var extraHeaders = getQosHearders();
         request.accept({ statusCode: 200, extraHeaders});
+        sendMessage(server, getStatsJson());
       }
     }
     var inviterOptions = InviterOptions = {};
@@ -224,6 +233,7 @@ export function userAgentCall(xpin, destination, mediaElementName, connected, di
     inviter.invite();
 
     activeSession = inviter;
+    activeServer = server
 
     // Handle outgoing session state changes.
     activeSession.stateChange.addListener((SessionState) => {
@@ -297,6 +307,7 @@ export function userAgentDisconnectCall(disconnected) {
                 }
             }
             session.bye(options);
+            sendMessage(activeSession.server, getStatsJson());
             disconnected();
           break;
         case SessionState.Terminating:

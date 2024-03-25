@@ -83,7 +83,7 @@ buttonConnect.addEventListener('click', ()=>{
 buttonCall.addEventListener('click', ()=>{ 
   var target = 'sip:'+localStorage.getItem('callee');
   console.log("calling:"+target)
-  userAgentCall("", target, "mediaElement", connected, disconnected);
+  userAgentCall("", localStorage.getItem('server'), target, "mediaElement", connected, disconnected);
 })
 
 buttonDisconnect.addEventListener('click', ()=>{
