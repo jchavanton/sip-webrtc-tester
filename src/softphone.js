@@ -102,8 +102,8 @@ async function startMedia(Session, mediaElementName) {
     // Assumes you have a media element on the DOM
     const mediaElement = document.getElementById(mediaElementName);
     const remoteStream = new MediaStream();
-    var sdh = Session.sessionDescriptionHandler;
-    var pc = sdh.peerConnection;
+      var sdh = Session.sessionDescriptionHandler;
+      var pc = sdh.peerConnection;
     pc.getReceivers().forEach((receiver) => {
        if (receiver.track) {
            remoteStream.addTrack(receiver.track);
@@ -124,7 +124,7 @@ export function UserAgentRegisteredOptionTags(userAgent) {
   registerer.register();
 }
 
-export function userAgentConnect(params, connected, disconnected) {
+export function userAgentConnect(params, connected, disconnected, display) {
   const transportOptions = {
     server: 'wss://'+params.server,
     keepAliveInterval: 60,
@@ -132,7 +132,13 @@ export function userAgentConnect(params, connected, disconnected) {
 
   var delegate = {
     onInvite: (invitation, connected, disconnected) => {
-      invitation.accept();
+      // invitation.accept();
+      if (activeSession != null) {
+        invitation.reject();
+        display(`Rejecting incomming call from ${invitation.request.from.uri.user} while in a session.`)
+      } else {
+        display(`Incomming call from ${invitation.request.from.uri.user} click answer.`);
+      }
       activeSession = invitation
       activeServer = params.server
       activeSession.stateChange.addListener((SessionState) => {
@@ -145,11 +151,11 @@ export function userAgentConnect(params, connected, disconnected) {
             startTime = Date.now();
             startMedia(invitation, "mediaElement");
             // connected();
-            console.log(`#### Session state changed >> to ${SessionState} connected !`);
-
+            display(`${SessionState}`);
             break;
           case SessionState.Terminated:
             disconnected();
+            display(`disconnected`);
             break;
           default:
             console.log(`#### unknown`);
@@ -161,6 +167,13 @@ export function userAgentConnect(params, connected, disconnected) {
   var uri = 'sip:'+params.username+'@'+params.server
   console.log("URI >>>> "+uri)
 
+  const sessionDescriptionHandlerFactoryOptions = {
+    iceGatheringTimeout: 500, //currently, the smallest allowed value
+    peerConnectionConfiguration: {
+      iceServers: [{ urls: "stun:54.243.200.121:3482" }]
+    }
+  }
+
   const userAgentOptions = {
     transportOptions : transportOptions,
     reconnectionAttempts: 4,
@@ -168,6 +181,7 @@ export function userAgentConnect(params, connected, disconnected) {
     authorizationUsername: params.username,
     authorizationPassword: params.password,
     uri: UserAgent.makeURI(uri),
+    sessionDescriptionHandlerFactoryOptions: sessionDescriptionHandlerFactoryOptions,
     delegate,
   };
   userAgent = new UserAgent(userAgentOptions);
@@ -201,10 +215,9 @@ function getQosHearders() {
   ];
   return extraHeaders;
 }
-
 var startTime = null;
 
-export function sendMessage(server, content) {
+export async function sendMessage(server, content) {
   const target = UserAgent.makeURI("sip:stats@"+server);
   const messager = new Messager(userAgent, target, content);
   messager.message()
@@ -263,13 +276,18 @@ export function userAgentCall(xpin, server, destination, mediaElementName, conne
      });
 }
 
-export function userAgentDisconnectCall(disconnected) {
+export function userAgentAcceptCall(answered) {
+  activeSession.accept() 
+  answered();
+}
+
+export function userAgentDisconnectCall(disconnected, display) {
 
     if (activeSession == null) {
-      console.log("hangup, no session ...")
+      display("no session to hangup")
       return;
     }
-    console.log("hangup ...")
+    display("hangup")
 
     var session = activeSession;
 
@@ -288,10 +306,6 @@ export function userAgentDisconnectCall(disconnected) {
           }
           break;
         case SessionState.Established:
-            //const content = 'Hello World';
-            //const target = UserAgent.makeURI("sip:bob@example.com");
-            //const messager = new Messager(userAgent, target, content);
-            //messager.message();
             var extraHeaders = getQosHearders();
             var options = {
                 requestDelegate : {
@@ -307,18 +321,21 @@ export function userAgentDisconnectCall(disconnected) {
                 }
             }
             session.bye(options);
+            activeSession = null;
             sendMessage(activeSession.server, getStatsJson());
             disconnected();
           break;
         case SessionState.Terminating:
+          display(`terminating`);
         case SessionState.Terminated:
-            // Cannot terminate a session that is already terminated
+          display(`terminated`);
           break;
       }
 }
 
-export function userAgentDisconnect(disconnected) {
-  console.log("disconnecting ...")
-  userAgentDisconnectCall(disconnected)
+export function userAgentDisconnect(disconnected, display) {
+  display(`disconnecting`);
+  userAgentDisconnectCall(disconnected, display)
   userAgent.stop();
+  activeSession = null;
 }

@@ -26,8 +26,11 @@ input { margin: 8px;}
 	<div>Password:       <input type="password" id="password" name="password" required minlength="1" maxlength="100"><button class="bset" id="set_password" >set</button></div>
 	<div>X-pin:          <input type="text" id="xpin" name="xpin" required minlength="5" maxlength="10"><button class="bset" id="set_xpin">set</button></div>
 	<div>callee:   `sip:`<input type="text" id="callee" name="callee" required minlength="1" maxlength="100"><button class="bset" id="set_callee">set</button></div>
-
-	<div><button id="connect">Connect</button>	<button id="call" >Place Call</button></div>
+<div><p style="text-align: center; color: #0633fd; border-style: dashed; border-width:1px ; border-color:#5775f8 ; width: 450px; border-spacing: 10px;" id="status_display">
+  Click connect to register to the user-proxy  .
+</p></div>
+	<div><button id="connect">Connect</button>	<button id="call" >Place Call</button><button id="answer" >Answer</button>
+    </div>
 	<div><button id="disconnect" >Disconnect</button> <button id="hangup" >Hangup Call</button>
        <p>
     While the call is established, DTMF may be sent using the following "keypad"...

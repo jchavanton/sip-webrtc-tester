@@ -9755,6 +9755,7 @@ function defaultPeerConnectionConfiguration() {
         certificates: undefined,
         iceCandidatePoolSize: 0,
         iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+        // iceServers: [{ urls: "stun:54.243.200.121:3482" }],
         iceTransportPolicy: "all",
         rtcpMuxPolicy: "require"
     };

@@ -16,11 +16,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA~
  */
 
-import {userAgentConnect, userAgentCall,userAgentDisconnectCall,userAgentDisconnect} from "./softphone";
+import {userAgentConnect, userAgentCall,userAgentDisconnectCall,userAgentAcceptCall,userAgentDisconnect} from "./softphone";
 
 var buttonConnect = document.querySelector('#connect');
 var buttonCall = document.querySelector('#call');
 var buttonHangup = document.querySelector('#hangup');
+var buttonAnswer = document.querySelector('#answer');
 var buttonDisconnect = document.querySelector('#disconnect');
 var buttonSetserver = document.querySelector('#set_server');
 var buttonSetusername = document.querySelector('#set_username');
@@ -60,12 +61,21 @@ buttonSetcallee.addEventListener('click', ()=>{
   localStorage.setItem("callee",v)
 })
 
+function display(t) {
+  document.getElementById("status_display").innerHTML = t;
+}
+
 function connected () {
   console.log("connected ...");
+  display("Connected you can now make and receive calls.");
 }
 
 function disconnected () {
   console.log("disconnected ...");
+}
+
+function answered () {
+  console.log("answered ...");
 }
 
 buttonConnect.addEventListener('click', ()=>{ 
@@ -77,19 +87,25 @@ buttonConnect.addEventListener('click', ()=>{
     xpin: localStorage.getItem('xpin'),
     callee: 'sip:'+localStorage.getItem('callee'),
   }
-  userAgentConnect(params, connected, disconnected);
+  userAgentConnect(params, connected, disconnected, display);
+  display("connected");
 })
 
 buttonCall.addEventListener('click', ()=>{ 
   var target = 'sip:'+localStorage.getItem('callee');
-  console.log("calling:"+target)
+  console.log("calling:"+target);
   userAgentCall("", localStorage.getItem('server'), target, "mediaElement", connected, disconnected);
 })
 
 buttonDisconnect.addEventListener('click', ()=>{
-  userAgentDisconnect(disconnected);
+  userAgentDisconnect(disconnected, display);
+})
+
+buttonAnswer.addEventListener('click', ()=>{
+  userAgentAcceptCall(answered);
 })
 
 buttonHangup.addEventListener('click', ()=>{
-  userAgentDisconnectCall(disconnected);
+  userAgentDisconnectCall(disconnected, display);
 })
+
